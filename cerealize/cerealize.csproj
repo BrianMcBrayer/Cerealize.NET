@@ -52,6 +52,10 @@
       <Project>{196B6B60-3C2A-4832-ADB6-82F83DB83B94}</Project>
       <Name>cerealize.common</Name>
     </ProjectReference>
+    <ProjectReference Include="..\cerealize.serializers.bond\cerealize.serializers.bond.csproj">
+      <Project>{7AD618CA-65B8-427C-AB7F-B472A98B3151}</Project>
+      <Name>cerealize.serializers.bond</Name>
+    </ProjectReference>
     <ProjectReference Include="..\cerealize.serializers.protobuf\cerealize.serializers.protobuf.csproj">
       <Project>{95811DC6-EDEB-4869-8665-6B463FEAC58A}</Project>
       <Name>cerealize.serializers.protobuf</Name>

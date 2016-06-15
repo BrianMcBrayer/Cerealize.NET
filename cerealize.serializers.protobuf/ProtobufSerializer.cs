@@ -12,6 +12,7 @@ namespace cerealize.serializers.protobuf
         public ProtobufSerializer()
         {
             ProtoBuf.Serializer.PrepareSerializer<ProtobufSimpleString>();
+            ProtoBuf.Serializer.PrepareSerializer<ProtobufDuplexString>();
         }
 
         public byte[] Serialize(IBaseObject obj)

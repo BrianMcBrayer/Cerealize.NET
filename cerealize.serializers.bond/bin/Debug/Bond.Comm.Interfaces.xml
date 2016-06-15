@@ -1,0 +1,773 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>Bond.Comm.Interfaces</name>
+    </assembly>
+    <members>
+        <member name="T:Bond.Comm.CodegenHelpers">
+            <summary>
+            Contains a collection of helper methods used primarily by
+            Bond-generated code.
+            </summary>
+        </member>
+        <member name="M:Bond.Comm.CodegenHelpers.Upcast``2(System.Threading.Tasks.Task{``0})">
+            <summary>
+            Upcasts a Task&lt;Derived&gt; to Task&lt;Base&gt;
+            </summary>
+            <typeparam name="TDerived">The derived type.</typeparam>
+            <typeparam name="TBase">The base type.</typeparam>
+            <param name="task">The task to upcast.</param>
+            <returns>The upcast task.</returns>
+            <remarks>
+            Work around for Task&lt;T&gt;'s lack of co-variance.
+            </remarks>
+        </member>
+        <member name="P:Bond.Comm.CodegenHelpers.CompletedTask">
+            <summary>
+            Returns a completed Task
+            </summary>
+        </member>
+        <member name="T:Bond.Comm.IRequestResponseConnection">
+            <summary>
+            Defines the operations that a connection that supports the
+            request/response messageing pattern must implement.
+            </summary>
+        </member>
+        <member name="M:Bond.Comm.IRequestResponseConnection.RequestResponseAsync``2(System.String,Bond.Comm.IMessage{``0},System.Threading.CancellationToken)">
+            <summary>
+            Starts an asynchronous operation to invoke a request/response
+            method.
+            </summary>
+            <typeparam name="TRequest">The type of the request.</typeparam>
+            <typeparam name="TResponse">The type of the response.</typeparam>
+            <param name="methodName">
+            The fully qualified name in the Bond namespace of the method to
+            invoke.
+            </param>
+            <param name="message">The message to send.</param>
+            <param name="ct">
+            The cancellation token for cooperative cancellation.
+            </param>
+            <returns>
+            A task that represents the result of invoking the method. This is
+            usually the response to the method, but may be an error.
+            </returns>
+        </member>
+        <member name="T:Bond.Comm.IEventConnection">
+            <summary>
+            Defines the operations that a connection that supports the event
+            messaging pattern must implement.
+            </summary>
+        </member>
+        <member name="M:Bond.Comm.IEventConnection.FireEventAsync``1(System.String,Bond.Comm.IMessage{``0})">
+            <summary>
+            Starts an asynchronous operation to invoke an event method.
+            </summary>
+            <typeparam name="TPayload">The type of the event.</typeparam>
+            <param name="methodName">
+            The fully qualified name in the Bond namespace of the method to
+            invoke.
+            </param>
+            <param name="message">The message to send.</param>
+            <returns>A task representing the asynchronous operation.</returns>
+            <remarks>
+            Event methods cannot send responses or error. However, the returned
+            task may represent an error if there was a local error sending the
+            message.
+            </remarks>
+        </member>
+        <member name="T:Bond.Comm.Connection">
+            <summary>
+            Defines a basic requirements of a connection.
+            </summary>
+        </member>
+        <member name="M:Bond.Comm.Connection.StopAsync">
+            <summary>
+            Starts an asynchronous operation to close a connection.
+            </summary>
+            <returns>A task representing the asynchronous operation.</returns>
+            <remarks>
+            Stopping a connection does not drain the connection of outstanding
+            messages. They may have been sent/received or not. Outstanding
+            requests expecting responses will be completed with failures.
+            </remarks>
+        </member>
+        <member name="T:Bond.Comm.Context">
+            <summary>
+            Represents the details about the current operation.
+            </summary>
+        </member>
+        <member name="P:Bond.Comm.Context.Connection">
+            <summary>
+            The connection being used.
+            </summary>
+            <remarks>
+            <para>
+            May be <c>null</c> if a connection-less protocol is being used.
+            </para>
+            <para>
+            For received messages, this is the connection the message was
+            received on. For messages that are being sent, this is the
+            connection that is being used to transmit the message.
+            </para>
+            <para>
+            Typically, this is cast to a more derived type, depending on the
+            transport that is being used, to get access to the
+            transport-specific members of a connection.
+            </para>
+            </remarks>
+        </member>
+        <member name="T:Bond.Comm.SendContext">
+            <summary>
+            Represents the details about the current send operation.
+            </summary>
+        </member>
+        <member name="T:Bond.Comm.ReceiveContext">
+            <summary>
+            Represents the details about the receive operation.
+            </summary>
+        </member>
+        <member name="T:Bond.Comm.ILayer`1">
+            <summary>
+            Interface for layer implementations. Layers provide extensibility hooks
+            in the comm framework. Layers have the the opportunity to act on each outgoing request
+            on the client side and each incoming request on the service side (and vice versa for
+            responses). Layers are aggregated into a stack of layers -- see <see cref="T:Bond.Comm.ILayerStack"/>.
+            </summary>
+            <remarks>
+            Layers are assumed to cooperatively share the same instance of type
+            <typeparamref name="TLayerData" />. TLayerData must be a Bond-serializable class.
+            </remarks>
+        </member>
+        <member name="M:Bond.Comm.ILayer`1.OnSend(Bond.Comm.MessageType,Bond.Comm.SendContext,`0)">
+            <summary>
+            Take action on sending of a message.
+            </summary>
+            <param name="messageType">The type of message</param>
+            <param name="context">The send context</param>
+            <param name="layerData">The layer data for this layer</param>
+            <remarks>
+            Layers may not interact with the message payload itself so it is not provided.
+            If this method throws, the exception will be caught by the exception handler of the layer stack
+            if configured or of the transport.
+            </remarks>
+        </member>
+        <member name="M:Bond.Comm.ILayer`1.OnReceive(Bond.Comm.MessageType,Bond.Comm.ReceiveContext,`0)">
+            <summary>
+            Take action on receipt of a message.
+            </summary>
+            <param name="messageType">The type of message</param>
+            <param name="context">The receive context</param>
+            <param name="layerData">The layer data for this layer</param>
+            <remarks>
+            Layers may not interact with the message payload itself so it is not provided.
+            If this method throws, the exception will be caught by the exception handler of the layer stack
+            if configured or of the transport.
+            </remarks>
+        </member>
+        <member name="T:Bond.Comm.ServiceCallback">
+            <summary>
+            Represents a method that implements a Bond service method.
+            </summary>
+            <param name="request">The request message.</param>
+            <param name="context">
+            The context in which the message was received.
+            </param>
+            <param name="ct">
+            The cancellation token for cooperative cancellation.
+            </param>
+            <returns>A task representing the response.</returns>
+            <remarks>
+            This class is primarily used by Bond's generated service
+            implementations.
+            </remarks>
+        </member>
+        <member name="T:Bond.Comm.ServiceCallbackType">
+            <summary>
+            Indicates the type of ServiceCallback
+            </summary>
+        </member>
+        <member name="F:Bond.Comm.ServiceCallbackType.RequestResponse">
+            <summary>
+            Method returns a Task&lt;IMessage&gt;
+            </summary>
+        </member>
+        <member name="F:Bond.Comm.ServiceCallbackType.Event">
+            <summary>
+            Method returns a Task
+            </summary>
+        </member>
+        <member name="T:Bond.Comm.ServiceMethodInfo">
+            <summary>
+            Data about a Bond service method.
+            </summary>
+        </member>
+        <member name="F:Bond.Comm.ServiceMethodInfo.MethodName">
+            <summary>
+            The fully qualified method name in the Bond namespace.
+            </summary>
+        </member>
+        <member name="F:Bond.Comm.ServiceMethodInfo.Callback">
+            <summary>
+            The delegate to invoke for this method.
+            </summary>
+        </member>
+        <member name="T:Bond.Comm.IService">
+            <summary>
+            Provides a mechanism for exposing Bond service methods.
+            </summary>
+        </member>
+        <member name="P:Bond.Comm.IService.Methods">
+            <summary>
+            Gets a collection of the Bond service methods exposed by the
+            implementor.
+            </summary>
+        </member>
+        <member name="T:Bond.Comm.ILayerStack">
+            <summary>
+            Interface for layer stacks. The layer stack encapsulates
+            a list of layers which work together over the same layer data.
+            </summary>
+        </member>
+        <member name="M:Bond.Comm.ILayerStack.OnSend(Bond.Comm.MessageType,Bond.Comm.SendContext,Bond.IBonded@)">
+            <summary>
+            Take action on sending of a message, by invoking a stack of layers (in forward order).
+            </summary>
+            <param name="messageType">The type of message</param>
+            <param name="context">The send context. May not be null.</param>
+            <param name="layerData">The layer data for this layer, provided as an instance in an <see cref="T:Bond.IBonded"/> ready to be serialized</param>
+            <returns>An error, or null if there is no error.</returns>
+            <remarks>
+            In general, the layer is not expected to interact with the message payload itself.
+            </remarks>
+        </member>
+        <member name="M:Bond.Comm.ILayerStack.OnReceive(Bond.Comm.MessageType,Bond.Comm.ReceiveContext,Bond.IBonded)">
+            <summary>
+            Take action on receipt of a message, by invoking a stack of layers (in reverse order).
+            </summary>
+            <param name="messageType">The type of message</param>
+            <param name="context">The receive context. May not be null.</param>
+            <param name="layerData">The layer data for this layer, provided as an <see cref="T:Bond.IBonded"/> to be deserialized</param>
+            <returns>An error, or null if there is no error.</returns>
+            <remarks>
+            In general, the layer is not expected to interact with the message payload itself.
+            </remarks>
+        </member>
+        <member name="T:Bond.Comm.ConnectedEventArgs">
+            <summary>
+            Provides data for the <see cref="E:Bond.Comm.Listener.Connected"/> event.
+            </summary>
+        </member>
+        <member name="F:Bond.Comm.ConnectedEventArgs.Connection">
+            <summary>
+            The connection that was just established.
+            </summary>
+        </member>
+        <member name="F:Bond.Comm.ConnectedEventArgs.DisconnectError">
+            <summary>
+            A value indicating whether the connection should be rejected.
+            </summary>
+            <remarks>
+            If this is set to a non-null value, the connection will be rejected
+            with the given error.
+            </remarks>
+        </member>
+        <member name="M:Bond.Comm.ConnectedEventArgs.#ctor(Bond.Comm.Connection)">
+            <summary>
+            Initializes a new instance of the ConnectedEventArgs class with the
+            given <see cref="F:Bond.Comm.ConnectedEventArgs.Connection"/>.
+            </summary>
+            <param name="connection">
+            The connection that was just established.
+            </param>
+        </member>
+        <member name="T:Bond.Comm.DisconnectedEventArgs">
+            <summary>
+            Provides data for the <see cref="E:Bond.Comm.Listener.Connected"/> event.
+            </summary>
+        </member>
+        <member name="F:Bond.Comm.DisconnectedEventArgs.Connection">
+            <summary>
+            The connection that was just disconnected.
+            </summary>
+        </member>
+        <member name="F:Bond.Comm.DisconnectedEventArgs.DisconnectError">
+            <summary>
+            The reason the connection was disconnected.
+            </summary>
+            <remarks>
+            The error may indicate a graceful shutdown, depending on the value
+            of <see cref="P:Bond.Comm.Error.error_code"/>.
+            </remarks>
+        </member>
+        <member name="M:Bond.Comm.DisconnectedEventArgs.#ctor(Bond.Comm.Connection,Bond.Comm.Error)">
+            <summary>
+            Initializes a new instance of the DisconnectedEventArgs class.
+            </summary>
+            <param name="connection">
+            The connection that was just disconnected.
+            </param>
+            <param name="error">
+            The reason the connection was disconnected.
+            </param>
+        </member>
+        <member name="T:Bond.Comm.Listener">
+            <summary>
+            Listens for connections and routes messages to the appropriate
+            <see cref="T:Bond.Comm.IService">services</see>.
+            </summary>
+        </member>
+        <member name="E:Bond.Comm.Listener.Connected">
+            <summary>
+            Occurs when a new connection has being established.
+            </summary>
+            <remarks>
+            <para>
+            The Connected event is raised when a new connection has been
+            established but before any messages have been transmitted across
+            it. The event can be used to setup connection-specific data
+            structures or to reject the connection.
+            </para>
+            <para>
+            Connected event handlers must not throw exceptions. The Listener
+            has no sensible way to handle the exception, and there is no way to
+            bubble the exception back to the application code. If an exception
+            is thrown, the process will be terminated.
+            </para>
+            </remarks>
+        </member>
+        <member name="E:Bond.Comm.Listener.Disconnected">
+            <summary>
+            Occurs when a connection has been disconnected.
+            </summary>
+            <remarks>
+            <para>
+            Disconnected event handlers must not throw exceptions. The Listener
+            has no sensible way to handle the exception, and there is no way to
+            bubble the exception back to the application code. If an exception
+            is thrown, the process will be terminated.
+            </para>
+            </remarks>
+        </member>
+        <member name="M:Bond.Comm.Listener.AddService``1(``0)">
+            <summary>
+            Adds a service to the listener.
+            </summary>
+            <typeparam name="T">The type of the service.</typeparam>
+            <param name="service">The service.</param>
+            <remarks>
+            After a service has been added, the listener will direct messages
+            addressed to the service's methods to this instance of the service.
+            </remarks>
+        </member>
+        <member name="M:Bond.Comm.Listener.RemoveService``1(``0)">
+            <summary>
+            Removes a service from the listener.
+            </summary>
+            <typeparam name="T">The type of the service.</typeparam>
+            <param name="service">The service.</param>
+            <remarks>
+            After a service has been removed, the listener will cease directing
+            messages to its methods and will respond with a
+            <see cref="F:Bond.Comm.ErrorCode.MethodNotFound"/> error.
+            </remarks>
+        </member>
+        <member name="M:Bond.Comm.Listener.IsRegistered(System.String)">
+            <summary>
+            Tests whether a given method has been registered.
+            </summary>
+            <param name="serviceMethodName">
+            The fully qualified method name in the Bond namespace.
+            </param>
+            <returns>
+            <c>true</c> if the method has been registered; otherwise
+            <c>false</c>.
+            </returns>
+        </member>
+        <member name="M:Bond.Comm.Listener.StartAsync">
+            <summary>
+            Starts an operation to begin accepting connections and dispatching
+            messages to services.
+            </summary>
+            <returns>
+            A task that represents the asynchronous operation.
+            </returns>
+        </member>
+        <member name="M:Bond.Comm.Listener.StopAsync">
+            <summary>
+            Starts an operation to stop listening.
+            </summary>
+            <returns>
+            A task that represents the asynchronous operation.
+            </returns>
+        </member>
+        <member name="T:Bond.Comm.LogSeverity">
+            <summary>
+            Represents the severity of a log message. Severities compare with &lt;
+            and &gt;. e.g., Debug &lt; Information.
+            </summary>
+        </member>
+        <member name="T:Bond.Comm.LogHandler">
+            <summary>
+            Once passed to <see cref="M:Bond.Comm.Log.SetHandler(Bond.Comm.LogHandler)"/>, will receive callbacks for
+            messages logged by Bond.
+            </summary>
+        </member>
+        <member name="M:Bond.Comm.LogHandler.Handle(Bond.Comm.LogSeverity,System.Exception,System.String,System.Object[])">
+            <summary>
+            Invoked for each log message that Bond wants to log.
+            </summary>
+            <param name="severity">The severity of the log message.</param>
+            <param name="exception">
+            The exception that is associated with the log message. May be
+            <c>null</c>.
+            </param>
+            <param name="format">The format string.</param>
+            <param name="args">The format string arguments.</param>
+            <remarks>
+            It is the responsibility of the LogHandler to format the message.
+            </remarks>
+        </member>
+        <member name="T:Bond.Comm.Log">
+            <summary>
+            Implement a <see cref="T:Bond.Comm.LogHandler"/> and pass it to
+            <see cref="M:Bond.Comm.Log.SetHandler(Bond.Comm.LogHandler)"/> to receive log messages.
+            </summary>
+        </member>
+        <member name="M:Bond.Comm.Log.SetHandler(Bond.Comm.LogHandler)">
+            <summary>
+            Sets a <see cref="T:Bond.Comm.LogHandler"/> to receive Bond log messages.
+            </summary>
+            <param name="newHandler">The handler to add.</param>
+            <exception cref="T:System.InvalidOperationException">
+            Thrown when there is another handler registered.
+            </exception>
+        </member>
+        <member name="M:Bond.Comm.Log.RemoveHandler">
+            <summary>
+            Removes the existing <see cref="T:Bond.Comm.LogHandler"/>.
+            </summary>
+            <remarks>
+            May be called even if there is no existing handler.
+            </remarks>
+        </member>
+        <member name="T:Bond.Comm.IMessage">
+            <summary>
+            Interface representing a message of an unknown payload type.
+            </summary>
+            <remarks>A message can contain either a payload or an error.</remarks>
+        </member>
+        <member name="P:Bond.Comm.IMessage.RawPayload">
+            <summary>
+            Gets the payload as a <see cref="T:Bond.IBonded"/> value.
+            </summary>
+            <exception cref="T:System.InvalidOperationException">
+            Thrown when the message contains an error and not a payload.
+            </exception>
+        </member>
+        <member name="P:Bond.Comm.IMessage.Error">
+            <summary>
+            Gets the error, if any.
+            </summary>
+            <remarks>
+            If the message has a payload and no error, <c>null</c> is returned.
+            </remarks>
+        </member>
+        <member name="P:Bond.Comm.IMessage.IsError">
+            <summary>
+            Gets a value indicating whether the message contains an error.
+            </summary>
+            <remarks>
+            If a message does not contain an error, it contains a payload.
+            </remarks>
+        </member>
+        <member name="M:Bond.Comm.IMessage.Convert``1">
+            <summary>
+            Converts this message to a
+            <see cref="T:Bond.Comm.IMessage`1">IMessage&lt;U&gt;</see>.
+            </summary>
+            <typeparam name="U">The type of the message payload.</typeparam>
+            <returns>
+            An instance of <see cref="T:Bond.Comm.IMessage`1">IMessage&lt;U&gt;</see>. If
+            the conversion fails, <c>null</c> is returned.
+            </returns>
+        </member>
+        <member name="T:Bond.Comm.IMessage`1">
+            <summary>
+            Interface representing a message of specific payload type.
+            </summary>
+            <typeparam name="T">The type of the message payload.</typeparam>
+            <remarks>A message can contain either a payload or an error.</remarks>
+        </member>
+        <member name="P:Bond.Comm.IMessage`1.Payload">
+            <summary>
+            Gets the payload as a <see cref="T:Bond.IBonded`1">IBonded&lt;T&gt;</see>
+            value.
+            </summary>
+            <exception cref="T:System.InvalidOperationException">
+            Thrown when the message contains an error and not a payload.
+            </exception>
+        </member>
+        <member name="T:Bond.Comm.Message">
+            <summary>
+            A message of an unknown payload type.
+            </summary>
+        </member>
+        <member name="M:Bond.Comm.Message.#ctor(Bond.IBonded)">
+            <summary>
+            Initializes a Message with the given payload.
+            </summary>
+            <param name="payload">The payload for the message.</param>
+        </member>
+        <member name="M:Bond.Comm.Message.FromPayload(Bond.IBonded)">
+            <summary>
+            Creates a message from the given payload.
+            </summary>
+            <param name="payload">The payload for the message.</param>
+            <returns>A payload message of unknown payload type.</returns>
+        </member>
+        <member name="M:Bond.Comm.Message.FromPayload``1(``0)">
+            <summary>
+            Creates a message from the given payload.
+            </summary>
+            <typeparam name="TPayload">
+            The type of the message payload.
+            </typeparam>
+            <param name="payload">The payload for the message.</param>
+            <returns>A payload message of the given payload type.</returns>
+        </member>
+        <member name="M:Bond.Comm.Message.FromPayload``1(Bond.IBonded{``0})">
+            <summary>
+            Creates a message from the given payload.
+            </summary>
+            <typeparam name="TPayload">
+            The type of the message payload.
+            </typeparam>
+            <param name="payload">The payload for the message.</param>
+            <returns>A payload message of the given payload type.</returns>
+        </member>
+        <member name="M:Bond.Comm.Message.FromError``1(Bond.Comm.Error)">
+            <summary>
+            Creates an error message from the given error.
+            </summary>
+            <typeparam name="TPayload">
+            The type of the message payload
+            </typeparam>
+            <param name="err">The error for the message.</param>
+            <returns>An error message of the given payload type.</returns>
+        </member>
+        <member name="M:Bond.Comm.Message.FromError``1(Bond.IBonded{Bond.Comm.Error})">
+            <summary>
+            Creates an error message from the given error.
+            </summary>
+            <typeparam name="TPayload">
+            The type of the message payload.
+            </typeparam>
+            <param name="err">The error for the message.</param>
+            <returns>An error message of the given payload type.</returns>
+        </member>
+        <member name="M:Bond.Comm.Message.FromError(Bond.Comm.Error)">
+            <summary>
+            Creates an error message from the given error.
+            </summary>
+            <param name="err">The error for the message.</param>
+            <returns>An error message of unknown payload type.</returns>
+            <exception cref="T:System.ArgumentException">
+            Thrown when <paramref name="err"/> has a zero
+            <see cref="P:Bond.Comm.Error.error_code"/>.
+            </exception>
+        </member>
+        <member name="M:Bond.Comm.Message.FromError(Bond.IBonded{Bond.Comm.Error})">
+            <summary>
+            Creates an error message from the given error.
+            </summary>
+            <param name="err">The error for the message.</param>
+            <returns>An error message of unknown payload type.</returns>
+        </member>
+        <member name="T:Bond.Comm.Message`1">
+            <summary>
+            A message of known type.
+            </summary>
+            <typeparam name="TPayload">The type of the message payload.</typeparam>
+        </member>
+        <member name="M:Bond.Comm.Message`1.#ctor(`0)">
+            <summary>
+            Creates a payload message from the given payload.
+            </summary>
+            <param name="payload">The message payload.</param>
+        </member>
+        <member name="M:Bond.Comm.Message`1.#ctor(Bond.IBonded{`0})">
+            <summary>
+            Creates a payload message from the given payload.
+            </summary>
+            <param name="payload">The message payload.</param>
+        </member>
+        <member name="T:Bond.Comm.MetricsHandler">
+            <summary>
+            Once passed to <see cref="M:Bond.Comm.Metrics.SetHandler(Bond.Comm.MetricsHandler)"/>, will receive callbacks
+            when new metrics are emitted by Bond.
+            </summary>
+        </member>
+        <member name="M:Bond.Comm.MetricsHandler.Handle(Bond.Comm.ConnectionMetrics)">
+            <summary>
+            Will be called once at the end of each connection.
+            </summary>
+        </member>
+        <member name="M:Bond.Comm.MetricsHandler.Handle(Bond.Comm.RequestMetrics)">
+            <summary>
+            Will be called once at the end of each request or event.
+            </summary>
+        </member>
+        <member name="T:Bond.Comm.Metrics">
+            <summary>
+            Implement a <see cref="T:Bond.Comm.MetricsHandler"/> and pass it to
+            <see cref="M:Bond.Comm.Metrics.SetHandler(Bond.Comm.MetricsHandler)"/> to receive metrics objects showing
+            what Bond is doing and where it's spending time.
+            </summary>
+        </member>
+        <member name="M:Bond.Comm.Metrics.SetHandler(Bond.Comm.MetricsHandler)">
+            <summary>
+            Sets a <see cref="T:Bond.Comm.MetricsHandler"/> to receive Bond metrics.
+            </summary>
+            <param name="newHandler">The handler to add.</param>
+            <exception cref="T:System.InvalidOperationException">
+            Thrown when there is another handler registered.
+            </exception>
+        </member>
+        <member name="M:Bond.Comm.Metrics.RemoveHandler">
+            <summary>
+            Removes the existing <see cref="T:Bond.Comm.MetricsHandler"/>.
+            </summary>
+            <remarks>
+            May be called even if there is no existing handler.
+            </remarks>
+        </member>
+        <member name="T:Bond.Comm.TransportBuilder`1">
+            <summary>
+            Provides a convenient way to initialize and create
+            <see cref="T:Bond.Comm.Transport">Transports</see>.
+            </summary>
+            <typeparam name="TTransport">
+            The type of transport this builder can build.
+            </typeparam>
+        </member>
+        <member name="M:Bond.Comm.TransportBuilder`1.SetLayerStack(Bond.Comm.ILayerStack)">
+            <summary>
+            Set the layer stack.
+            </summary>
+            <param name="layerStack">The layer stack.</param>
+            <returns>The builder.</returns>
+            <remarks>
+            The layer stack supplies the set of layers to be used
+            by the built transport. May be null.
+            </remarks>
+        </member>
+        <member name="M:Bond.Comm.TransportBuilder`1.Construct">
+            <summary>
+            Create the transport.
+            </summary>
+            <returns>
+            An instance of <typeparamref name="TTransport"/>.
+            </returns>
+        </member>
+        <member name="T:Bond.Comm.Transport">
+            <summary>
+            Defines the basic requirements of a Transport.
+            </summary>
+        </member>
+        <member name="P:Bond.Comm.Transport.LayerStack">
+            <summary>
+            The layer stack for this transport. May be null.
+            </summary>
+        </member>
+        <member name="M:Bond.Comm.Transport.ConnectToAsync(System.String)">
+            <summary>
+            Starts an asynchronous operation to connect to the specified
+            address.
+            </summary>
+            <param name="address">The address to connect to.</param>
+            <returns>A task of the <see cref="T:Bond.Comm.Connection"/>.</returns>
+            <remarks>
+            Each transport uses its own format for addresses. Consult the
+            concrete implementation that is being used for details.
+            </remarks>
+        </member>
+        <member name="M:Bond.Comm.Transport.ConnectToAsync(System.String,System.Threading.CancellationToken)">
+            <summary>
+            Starts an asynchronous operation to connect to the specified
+            address.
+            </summary>
+            <param name="address">The address to connect to.</param>
+            <param name="ct">The cancellation token.</param>
+            <returns>A task of the <see cref="T:Bond.Comm.Connection"/>.</returns>
+            <remarks>
+            Each transport uses its own format for addresses. Consult the
+            concrete implementation that is being used for details.
+            </remarks>
+        </member>
+        <member name="M:Bond.Comm.Transport.MakeListener(System.String)">
+            <summary>
+            Creates a <see cref="T:Bond.Comm.Listener"/> that can be used to accept
+            connections.
+            </summary>
+            <param name="address">The address to listen on.</param>
+            <returns>
+            A Listener that when started will listen on
+            <paramref name="address"/>.
+            </returns>
+            <remarks>
+            Each transport uses its own format for addresses. Consult the
+            concrete implementation that is being used for details.
+            </remarks>
+        </member>
+        <member name="M:Bond.Comm.Transport.StopAsync">
+            <summary>
+            Starts an asynchronous operation to close all connections and stop
+            all listeners.
+            </summary>
+            <returns>
+            A task that represents the shutting down the connections and
+            listeners.
+            </returns>
+            <remarks>
+            Stopping a transport does not drain the connection of outstanding
+            messages. They may have been sent/received or not. Outstanding
+            requests expecting responses will be completed with failures.
+            </remarks>
+        </member>
+        <member name="M:Bond.Comm.Transport.MakeInternalServerError(System.Exception,System.Boolean)">
+            <summary>
+            Creates an <see cref="T:Bond.Comm.Error"/> for an internal server error from an
+            exception.
+            </summary>
+            <param name="exception">The exception.</param>
+            <param name="includeDetails">
+            <c>true</c> if debugging details should be included; <c>false</c>
+            to omit this potentailly sensitive information
+            </param>
+            <returns>An Error representing the exception.</returns>
+        </member>
+        <member name="T:Bond.Comm.TransportException">
+            <summary>
+            Represents an transport-level exception.
+            </summary>
+            <remarks>
+            Used as the base exception class for transport-specific exception.
+            </remarks>
+        </member>
+        <member name="M:Bond.Comm.TransportException.#ctor(System.String)">
+            <summary>
+            Creates a TransportException with the given message.
+            </summary>
+            <param name="message">The message.</param>
+        </member>
+        <member name="M:Bond.Comm.TransportException.#ctor(System.String,System.Exception)">
+            <summary>
+            Creates a TransportException with the given message and inner
+            exception.
+            </summary>
+            <param name="message">The message.</param>
+            <param name="innerException">The inner exception.</param>
+        </member>
+    </members>
+</doc>

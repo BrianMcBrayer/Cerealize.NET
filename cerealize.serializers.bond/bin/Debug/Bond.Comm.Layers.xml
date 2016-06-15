@@ -1,0 +1,25 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>Bond.Comm.Layers</name>
+    </assembly>
+    <members>
+        <member name="T:Bond.Comm.Layers.LayerStack`1">
+            <summary>
+            Concrete layer stack implementation. The layer stack encapsulates
+            a list of layers which work together over the same layer data.
+            </summary>
+            <typeparam name="TLayerData">Type shared by the layers of this stack. Must be a Bond-serailizable type.</typeparam>
+            <remarks>
+            Layers are assumed to cooperatively share the same instance of type
+            TLayerData. TLayerData must be a Bond-serializable class.
+            </remarks>
+        </member>
+        <member name="M:Bond.Comm.Layers.LayerStack`1.#ctor(Bond.Comm.ILayer{`0}[])">
+            <summary>
+            Construct an empty layer stack instance.
+            </summary>
+            <param name="layers">Layers for this stack. Must be at least one and all must not be null.</param>
+        </member>
+    </members>
+</doc>

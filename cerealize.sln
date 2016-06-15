@@ -9,6 +9,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "cerealize.common", "cereali
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "cerealize.serializers.protobuf", "cerealize.serializers.protobuf\cerealize.serializers.protobuf.csproj", "{95811DC6-EDEB-4869-8665-6B463FEAC58A}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "cerealize.serializers.bond", "cerealize.serializers.bond\cerealize.serializers.bond.csproj", "{7AD618CA-65B8-427C-AB7F-B472A98B3151}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -27,6 +29,10 @@ Global
 		{95811DC6-EDEB-4869-8665-6B463FEAC58A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{95811DC6-EDEB-4869-8665-6B463FEAC58A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{95811DC6-EDEB-4869-8665-6B463FEAC58A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7AD618CA-65B8-427C-AB7F-B472A98B3151}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7AD618CA-65B8-427C-AB7F-B472A98B3151}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7AD618CA-65B8-427C-AB7F-B472A98B3151}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7AD618CA-65B8-427C-AB7F-B472A98B3151}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
