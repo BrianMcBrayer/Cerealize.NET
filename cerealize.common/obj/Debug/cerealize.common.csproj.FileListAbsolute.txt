@@ -1,0 +1,5 @@
+C:\code\cerealize\cerealize\cerealize.common\bin\Debug\cerealize.common.dll
+C:\code\cerealize\cerealize\cerealize.common\bin\Debug\cerealize.common.pdb
+C:\code\cerealize\cerealize\cerealize.common\obj\Debug\cerealize.common.csprojResolveAssemblyReference.cache
+C:\code\cerealize\cerealize\cerealize.common\obj\Debug\cerealize.common.dll
+C:\code\cerealize\cerealize\cerealize.common\obj\Debug\cerealize.common.pdb

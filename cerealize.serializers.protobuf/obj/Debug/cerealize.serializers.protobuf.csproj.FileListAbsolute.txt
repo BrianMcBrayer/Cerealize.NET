@@ -1,0 +1,10 @@
+C:\code\cerealize\cerealize\cerealize.serializers.protobuf\bin\Debug\cerealize.serializers.protobuf.dll
+C:\code\cerealize\cerealize\cerealize.serializers.protobuf\bin\Debug\cerealize.serializers.protobuf.pdb
+C:\code\cerealize\cerealize\cerealize.serializers.protobuf\bin\Debug\cerealize.common.dll
+C:\code\cerealize\cerealize\cerealize.serializers.protobuf\bin\Debug\protobuf-net.dll
+C:\code\cerealize\cerealize\cerealize.serializers.protobuf\bin\Debug\cerealize.common.pdb
+C:\code\cerealize\cerealize\cerealize.serializers.protobuf\bin\Debug\protobuf-net.pdb
+C:\code\cerealize\cerealize\cerealize.serializers.protobuf\bin\Debug\protobuf-net.xml
+C:\code\cerealize\cerealize\cerealize.serializers.protobuf\obj\Debug\cerealize.serializers.protobuf.csprojResolveAssemblyReference.cache
+C:\code\cerealize\cerealize\cerealize.serializers.protobuf\obj\Debug\cerealize.serializers.protobuf.dll
+C:\code\cerealize\cerealize\cerealize.serializers.protobuf\obj\Debug\cerealize.serializers.protobuf.pdb
